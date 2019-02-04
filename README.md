@@ -1,15 +1,15 @@
 # Netifi Proteus HTTP Gateway
 [![Build Status](https://travis-ci.org/netifi-proteus/proteus-httpgateway.svg?branch=master)](https://travis-ci.org/netifi-proteus/proteus-httpgateway)
 
-An API Gateway that allows bridging HTTP with [Netifi Proteus](https://www.netifi.com/proteus.html).
+An API gateway that allows bridging HTTP with [Netifi Proteus](https://www.netifi.com/proteus.html).
 
-## How does the Proteus HTTP Gateway work?
-The diagram below shows the high-level architecture of how messages are received and routed by the Proteus HTTP Gateway.
+## How Does the Proteus HTTP Gateway work?
+The diagram below shows the high-level architecture of how messages are received and routed by the Proteus HTTP gateway.
  
 ![diagram](diagram.png)
 
 #### 1. Send HTTP Request
-Client makes an HTTP POST request to a URL in one of the following format:
+The HTTP client makes an HTTP `POST` request to a URL in one of the following formats:
 
 If automatic load-balancing across a group of services is desired:
 
@@ -19,37 +19,41 @@ If a specific service instance is desired:
 
     https://{gateway host}/{group}/{destination}/{service}/{method}
     
-The request body must be in JSON format and the field names much match those of the service IDL.
+The request body must be in JSON format and the field names must match those defined in the service's interface definition
+language (IDL) prototype.
 
 #### 2. Convert HTTP Request to Proteus
-The incoming HTTP request is mapped to a Proteus Service IDL based on the URL and request body. The JSON request body fields
-must match the fields on the IDL exactly. 
+The HTTP gateway maps the incoming HTTP request to a Proteus service interface based on the request's URL and request body.
+The JSON request body fields must match the fields in the IDL exactly. 
 
-If no matching IDL can be found an error is returned.
+If the HTTP gateway service can find no matching interface, it returns an error.
 
 #### 3. Send Request via Proteus Channel
-The request is then sent to the Proteus Broker cluster which transparently handles service discovery and load balancing to the backend services.
+The HTTP gateway then sends the request to the Proteus broker cluster which transparently handles service discovery and load
+balancing to the backend services.
 
-If a destination was specified in the URL then the request will be sent to that specific instance. If only a group was specified, Proteus will
-load balance the request to the healthiest, most performant instance, in the group using our Predictive Load Balancing algorithm.
+If the HTTP client specified a destination in the URL then the broker will send the resulting request to that specific
+instance. If the HTTP client specified only a group, Proteus will load balance the request to the healthiest, most performant
+instance in the group using its predictive load balancing algorithm.
 
 #### 4. Invoke Service Method
 The request arrives and invokes the Proteus service method.
 
 #### 5. Send Response via Proteus Proteus Channel
-The Proteus service response is sent to the Proteus Broker cluster via the same bidirectional channel used by the request.
+The Proteus service replies, sending its response to the Proteus broker cluster via the same bidirectional channel used by
+the request.
 
 #### 6. Send HTTP Response
-The Proteus service response is converted into an HTTP response with a JSON message body and sent back to the requesting client to
-complete the interaction.
+The HTTP gateway converts the Proteus service response into an HTTP response with a JSON message body and sends it back to
+the requesting client to complete the interaction.
 
 ## Building Proteus HTTP Gateway
-You can build Proteus HTTP Gateway as an executable jar using the following command:
+You can build the Proteus HTTP gateway as an executable jar by issuing the following command:
 
     $ ./gradlew clean build
     
 ## Examples
-Please see the included [demo project](demo) for an example on how to configure and use Proteus HTTP Gateway.
+Please see the included [demo project](demo) for an example on how to configure and use Proteus HTTP gateway.
 
 ## Bugs and Feedback
 For bugs, questions, and discussions please use the [Github Issues](https://github.com/netifi-proteus/proteus-httpgateway/issues).
